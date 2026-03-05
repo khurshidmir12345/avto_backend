@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\MoshinaElonController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,10 +16,20 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'user']);
+        Route::post('/avatar', [AuthController::class, 'uploadAvatar']);
         Route::put('/profile', [AuthController::class, 'updateProfile']);
         Route::put('/password', [AuthController::class, 'changePassword']);
         Route::delete('/profile', [AuthController::class, 'deleteProfile']);
     });
+});
+
+Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
+    Route::get('/conversations', [ChatController::class, 'index']);
+    Route::post('/conversations', [ChatController::class, 'store']);
+    Route::get('/users', [ChatController::class, 'users']);
+    Route::get('/conversations/{conversation}/messages', [ChatController::class, 'messages']);
+    Route::post('/conversations/{conversation}/messages', [ChatController::class, 'sendMessage']);
+    Route::get('/media/{message}', [ChatController::class, 'media']);
 });
 
 Route::prefix('elonlar')->group(function () {

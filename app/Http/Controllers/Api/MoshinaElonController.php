@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\MoshinaElon\MyElonlarRequest;
 use App\Http\Requests\MoshinaElon\StoreMoshinaElonRequest;
 use App\Http\Requests\MoshinaElon\UpdateMoshinaElonRequest;
 use App\Http\Requests\MoshinaElon\UploadImagesRequest;
@@ -79,15 +80,16 @@ class MoshinaElonController extends Controller
         ]);
     }
 
-    public function myElonlar(Request $request): MoshinaElonCollection
+    public function myElonlar(MyElonlarRequest $request): MoshinaElonCollection
     {
-        $perPage = $request->get('per_page', config('moshina_elon.per_page'));
+        $validated = $request->validated();
+        $perPage = (int) ($validated['per_page'] ?? config('moshina_elon.per_page'));
 
         $elonlar = $request->user()
             ->moshinaElons()
             ->with(['category:id,name,slug,icon', 'images'])
             ->latest()
-            ->paginate((int) $perPage);
+            ->paginate($perPage);
 
         return new MoshinaElonCollection($elonlar);
     }

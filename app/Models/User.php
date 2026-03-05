@@ -12,16 +12,22 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected $appends = ['avatar_url', 'avatar_icon'];
+
     protected $fillable = [
         'name',
         'phone',
         'password',
         'phone_verified_at',
+        'avatar_path',
+        'avatar_disk',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'avatar_path',
+        'avatar_disk',
     ];
 
     protected function casts(): array
@@ -45,5 +51,44 @@ class User extends Authenticatable
     public function moshinaElonImages(): HasMany
     {
         return $this->hasMany(MoshinaElonImage::class);
+    }
+
+    public function conversationsAsA(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'user_a_id');
+    }
+
+    public function conversationsAsB(): HasMany
+    {
+        return $this->hasMany(Conversation::class, 'user_b_id');
+    }
+
+    public function sentMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        if (empty($this->avatar_path)) {
+            return null;
+        }
+
+        $r2PublicUrl = config('filesystems.disks.r2.url') ?? env('R2_PUBLIC_URL');
+
+        if (($this->avatar_disk ?? 'r2') === 'r2' && !empty($r2PublicUrl)) {
+            return rtrim($r2PublicUrl, '/') . '/' . ltrim($this->avatar_path, '/');
+        }
+
+        if (($this->avatar_disk ?? 'r2') === 'public') {
+            return rtrim(config('app.url'), '/') . '/storage/' . ltrim($this->avatar_path, '/');
+        }
+
+        return rtrim(config('app.url'), '/') . '/media/' . ltrim($this->avatar_path, '/');
+    }
+
+    public function getAvatarIconAttribute(): ?string
+    {
+        return $this->getAvatarUrlAttribute();
     }
 }

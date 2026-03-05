@@ -52,6 +52,7 @@ return [
         'max_size_kb' => 20480, // 20MB
         'path_prefix_user' => 'uploads',
         'path_prefix_elon' => 'elonlar',
+        'path_prefix_avatar' => 'avatars',
     ],
 
     /*

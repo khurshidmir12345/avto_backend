@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Services\SmsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Throwable;
 
@@ -150,6 +151,47 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Profil muvaffaqiyatli yangilandi',
             'user' => $request->user()->fresh(),
+        ]);
+    }
+
+    public function uploadAvatar(Request $request): JsonResponse
+    {
+        $request->validate([
+            'avatar' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
+        ], [
+            'avatar.required' => 'Avatar rasmi yuborilishi kerak',
+            'avatar.image' => 'Avatar fayli rasm bo\'lishi kerak',
+            'avatar.mimes' => 'Avatar formati: jpeg, jpg, png, webp',
+            'avatar.max' => 'Avatar maksimum 10240KB bo\'lishi kerak',
+        ]);
+
+        $user = $request->user();
+        $disk = config('moshina_elon.images.disk', 'r2');
+        $pathPrefix = config('moshina_elon.images.path_prefix_avatar', 'avatars');
+        $path = $request->file('avatar')->store("{$pathPrefix}/{$user->id}", $disk);
+
+        if (!$path) {
+            return response()->json([
+                'message' => 'Rasm yuklashda xatolik yuz berdi',
+            ], 500);
+        }
+
+        if (!empty($user->avatar_path)) {
+            try {
+                Storage::disk($user->avatar_disk ?: $disk)->delete($user->avatar_path);
+            } catch (Throwable) {
+                // Ignore delete errors for old avatar
+            }
+        }
+
+        $user->update([
+            'avatar_path' => $path,
+            'avatar_disk' => $disk,
+        ]);
+
+        return response()->json([
+            'message' => 'Profil rasmi muvaffaqiyatli yuklandi',
+            'user' => $user->fresh(),
         ]);
     }
 

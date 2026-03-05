@@ -87,6 +87,7 @@ Authorization: Bearer {token}
     "id": 1,
     "name": "Ali Valiyev",
     "phone": "998901234567",
+    "avatar_url": "https://cdn.example.com/avatars/1/avatar.jpg",
     "phone_verified_at": "2026-02-26T13:27:26.000000Z",
     "created_at": "2026-02-26T13:27:26.000000Z",
     "updated_at": "2026-02-26T13:27:26.000000Z"
@@ -122,6 +123,7 @@ Authorization: Bearer {token}
     "id": 1,
     "name": "Ali Valiyev",
     "phone": "998901234567",
+    "avatar_url": "https://cdn.example.com/avatars/1/avatar.jpg",
     "phone_verified_at": "2026-02-26T13:27:26.000000Z",
     "created_at": "2026-02-26T13:27:26.000000Z",
     "updated_at": "2026-02-26T13:27:26.000000Z"
@@ -146,6 +148,7 @@ Authorization: Bearer {token}
     "id": 1,
     "name": "Ali Valiyev",
     "phone": "998901234567",
+    "avatar_url": "https://cdn.example.com/avatars/1/avatar.jpg",
     "phone_verified_at": "2026-02-26T13:27:26.000000Z",
     "created_at": "2026-02-26T13:27:26.000000Z",
     "updated_at": "2026-02-26T13:27:26.000000Z"
@@ -192,6 +195,7 @@ Authorization: Bearer {token}
     "id": 1,
     "name": "Yangi Ism",
     "phone": "998901234567",
+    "avatar_url": "https://cdn.example.com/avatars/1/avatar.jpg",
     "phone_verified_at": "2026-02-26T13:27:26.000000Z",
     "created_at": "2026-02-26T13:27:26.000000Z",
     "updated_at": "2026-03-02T15:04:40.000000Z"
@@ -242,6 +246,34 @@ Foydalanuvchi profilini butunlay o'chiradi. Barcha tokenlar ham o'chiriladi.
 ```json
 {
   "message": "Profil muvaffaqiyatli o'chirildi"
+}
+```
+
+---
+
+### 1.9 Profil rasmi yuklash
+
+**Endpoint:** `POST /api/auth/avatar`  
+**Auth:** Ha
+**Content-Type:** `multipart/form-data`
+
+| Maydon | Turi | Majburiy | Validatsiya |
+|--------|------|----------|-------------|
+| avatar | file | Ha | jpeg, jpg, png, webp, max 10MB |
+
+**200 Response:**
+```json
+{
+  "message": "Profil rasmi muvaffaqiyatli yuklandi",
+  "user": {
+    "id": 1,
+    "name": "Ali Valiyev",
+    "phone": "998901234567",
+    "avatar_url": "https://cdn.example.com/avatars/1/avatar.jpg",
+    "phone_verified_at": "2026-02-26T13:27:26.000000Z",
+    "created_at": "2026-02-26T13:27:26.000000Z",
+    "updated_at": "2026-03-02T15:04:40.000000Z"
+  }
 }
 ```
 
@@ -655,6 +687,7 @@ Barcha maydonlar ixtiyoriy (faqat o'zgartiriladiganlar yuboriladi).
 | POST | `/api/auth/login` | Yo'q | Kirish |
 | GET | `/api/auth/user` | Ha | Joriy foydalanuvchi |
 | POST | `/api/auth/logout` | Ha | Chiqish |
+| POST | `/api/auth/avatar` | Ha | Profil rasmini yuklash |
 | PUT | `/api/auth/profile` | Ha | Profilni yangilash (name) |
 | PUT | `/api/auth/password` | Ha | Parolni o'zgartirish |
 | DELETE | `/api/auth/profile` | Ha | Profilni o'chirish |

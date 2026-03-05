@@ -25,6 +25,7 @@ class StorageProxyController extends Controller
         $allowedPrefixes = [
             config('moshina_elon.images.path_prefix_user', 'uploads'),
             config('moshina_elon.images.path_prefix_elon', 'elonlar'),
+            config('moshina_elon.images.path_prefix_avatar', 'avatars'),
         ];
 
         $allowed = false;
