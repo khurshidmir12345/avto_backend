@@ -48,9 +48,9 @@ class User extends Authenticatable
         return $this->hasMany(MoshinaElon::class);
     }
 
-    public function moshinaElonImages(): HasMany
+    public function carImages(): HasMany
     {
-        return $this->hasMany(MoshinaElonImage::class);
+        return $this->hasMany(CarImage::class);
     }
 
     public function conversationsAsA(): HasMany

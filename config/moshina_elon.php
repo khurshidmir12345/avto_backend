@@ -48,11 +48,10 @@ return [
     */
     'images' => [
         'disk' => env('ELON_IMAGES_DISK', 'r2'),
-        'mimes' => ['jpeg', 'jpg', 'png', 'webp'],
-        'max_size_kb' => 20480, // 20MB
-        'path_prefix_user' => 'uploads',
-        'path_prefix_elon' => 'elonlar',
-        'path_prefix_avatar' => 'avatars',
+        'mimes' => ['jpeg', 'jpg', 'png'],
+        'max_size_kb' => 10240, // 10MB
+        'cdn_url' => env('IMAGE_CDN_URL', 'https://img.avtovodiy.uz'),
+        'presigned_expiry_minutes' => env('IMAGE_PRESIGNED_EXPIRY_MINUTES', 15),
     ],
 
     /*

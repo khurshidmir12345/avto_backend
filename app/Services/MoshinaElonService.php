@@ -11,7 +11,7 @@ class MoshinaElonService
 {
     public function __construct(
         private readonly MoshinaElonRepository $repository,
-        private readonly MoshinaElonImageService $imageService
+        private readonly CarImageService $carImageService
     ) {}
 
     public function create(User $user, array $data): MoshinaElon
@@ -22,7 +22,7 @@ class MoshinaElonService
         $elon = $user->moshinaElons()->create($data);
 
         if (!empty($imageIds)) {
-            $this->imageService->attachImagesToElon($elon, $imageIds, $user->id);
+            $this->carImageService->attachToCar($elon, $imageIds, $user->id);
         }
 
         return $elon->load('images');

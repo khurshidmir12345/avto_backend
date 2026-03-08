@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use App\Models\MoshinaElon;
 use App\Repositories\MoshinaElonRepository;
-use App\Services\MoshinaElonImageService;
+use App\Services\CarImageService;
 use App\Services\MoshinaElonService;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,7 +16,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(MoshinaElonRepository::class, fn () => new MoshinaElonRepository(app(MoshinaElon::class)));
-        $this->app->singleton(MoshinaElonImageService::class);
+        $this->app->singleton(CarImageService::class);
         $this->app->singleton(MoshinaElonService::class);
     }
 

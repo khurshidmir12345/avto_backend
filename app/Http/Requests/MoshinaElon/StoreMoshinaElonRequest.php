@@ -37,7 +37,7 @@ class StoreMoshinaElonRequest extends FormRequest
             'bank_kredit' => ['nullable', 'boolean'],
             'general' => ['nullable', 'boolean'],
             'image_ids' => ['nullable', 'array'],
-            'image_ids.*' => ['integer', 'exists:moshina_elon_images,id'],
+            'image_ids.*' => ['integer', 'exists:car_images,id'],
         ];
     }
 

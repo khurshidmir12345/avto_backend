@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\MoshinaElonController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,18 +33,23 @@ Route::prefix('chat')->middleware('auth:sanctum')->group(function () {
     Route::get('/media/{message}', [ChatController::class, 'media']);
 });
 
+Route::prefix('images')->middleware('auth:sanctum')->group(function () {
+    Route::post('/presigned-url', [ImageController::class, 'presignedUrl']);
+    Route::post('/save', [ImageController::class, 'save']);
+    Route::delete('/{image}', [ImageController::class, 'deleteOrphanImage']);
+});
+
 Route::prefix('elonlar')->group(function () {
     Route::get('/', [MoshinaElonController::class, 'index']);
+    Route::get('/{moshinaElon}/images', [MoshinaElonController::class, 'images']);
     Route::get('/{moshinaElon}', [MoshinaElonController::class, 'show']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/my/list', [MoshinaElonController::class, 'myElonlar']);
-        Route::post('/images/upload', [MoshinaElonController::class, 'uploadImagesFirst']);
         Route::post('/', [MoshinaElonController::class, 'store']);
         Route::put('/{moshinaElon}', [MoshinaElonController::class, 'update']);
         Route::delete('/{moshinaElon}', [MoshinaElonController::class, 'destroy']);
-        Route::delete('/images/{image}', [MoshinaElonController::class, 'deleteOrphanImage']);
-        Route::post('/{moshinaElon}/images', [MoshinaElonController::class, 'uploadImages']);
         Route::delete('/{moshinaElon}/images/{image}', [MoshinaElonController::class, 'deleteImage']);
+        Route::put('/{moshinaElon}/images/reorder', [MoshinaElonController::class, 'reorderImages']);
     });
 });

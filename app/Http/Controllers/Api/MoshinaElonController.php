@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MoshinaElon\MyElonlarRequest;
 use App\Http\Requests\MoshinaElon\StoreMoshinaElonRequest;
 use App\Http\Requests\MoshinaElon\UpdateMoshinaElonRequest;
-use App\Http\Requests\MoshinaElon\UploadImagesRequest;
+use App\Http\Resources\CarImageResource;
 use App\Http\Resources\MoshinaElonCollection;
 use App\Http\Resources\MoshinaElonResource;
+use App\Models\CarImage;
 use App\Models\MoshinaElon;
-use App\Models\MoshinaElonImage;
 use App\Repositories\MoshinaElonRepository;
-use App\Services\MoshinaElonImageService;
+use App\Services\CarImageService;
 use App\Services\MoshinaElonService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -22,7 +22,7 @@ class MoshinaElonController extends Controller
     public function __construct(
         private readonly MoshinaElonRepository $repository,
         private readonly MoshinaElonService $elonService,
-        private readonly MoshinaElonImageService $imageService
+        private readonly CarImageService $carImageService
     ) {}
 
     public function index(Request $request): MoshinaElonCollection|JsonResponse
@@ -42,7 +42,7 @@ class MoshinaElonController extends Controller
 
     public function show(MoshinaElon $moshinaElon): JsonResponse
     {
-        $moshinaElon->load(['user:id,name,phone', 'category:id,name,slug,icon', 'images']);
+        $moshinaElon->load(['user:id,name,phone,avatar_path,avatar_disk', 'category:id,name,slug,icon', 'images']);
 
         return response()->json([
             'elon' => new MoshinaElonResource($moshinaElon),
@@ -94,40 +94,26 @@ class MoshinaElonController extends Controller
         return new MoshinaElonCollection($elonlar);
     }
 
-    public function uploadImagesFirst(UploadImagesRequest $request): JsonResponse
+    /**
+     * GET /api/elonlar/{id}/images
+     */
+    public function images(MoshinaElon $moshinaElon): JsonResponse
     {
-        $images = $this->imageService->uploadForUser(
-            $request->user()->id,
-            $request->file('images', [])
-        );
+        $images = $moshinaElon->images()->orderBy('sort_order')->get();
 
         return response()->json([
-            'message' => $images->count() . ' ta rasm muvaffaqiyatli yuklandi',
-            'images' => $images->map(fn ($img) => ['id' => $img->id, 'url' => $img->public_url, 'sort_order' => $img->sort_order]),
-        ], 201);
+            'images' => CarImageResource::collection($images),
+        ]);
     }
 
-    public function uploadImages(UploadImagesRequest $request, MoshinaElon $moshinaElon): JsonResponse
+    /**
+     * DELETE /api/elonlar/{id}/images/{imageId}
+     */
+    public function deleteImage(Request $request, MoshinaElon $moshinaElon, CarImage $image): JsonResponse
     {
         $this->authorize('manageImages', $moshinaElon);
 
-        $images = $this->imageService->uploadForElon(
-            $moshinaElon,
-            $request->file('images', []),
-            $request->user()->id
-        );
-
-        return response()->json([
-            'message' => $images->count() . ' ta rasm muvaffaqiyatli yuklandi',
-            'images' => $images->map(fn ($img) => ['id' => $img->id, 'url' => $img->public_url, 'sort_order' => $img->sort_order]),
-        ], 201);
-    }
-
-    public function deleteImage(Request $request, MoshinaElon $moshinaElon, MoshinaElonImage $image): JsonResponse
-    {
-        $this->authorize('manageImages', $moshinaElon);
-
-        if ($image->moshina_elon_id !== $moshinaElon->id) {
+        if ($image->car_id !== $moshinaElon->id) {
             return response()->json(['message' => 'Rasm bu e\'longa tegishli emas'], 404);
         }
 
@@ -136,12 +122,21 @@ class MoshinaElonController extends Controller
         return response()->json(['message' => 'Rasm muvaffaqiyatli o\'chirildi']);
     }
 
-    public function deleteOrphanImage(Request $request, MoshinaElonImage $image): JsonResponse
+    /**
+     * PUT /api/elonlar/{id}/images/reorder
+     */
+    public function reorderImages(Request $request, MoshinaElon $moshinaElon): JsonResponse
     {
-        $this->authorize('deleteOrphanImage', $image);
+        $this->authorize('manageImages', $moshinaElon);
 
-        $image->delete();
+        $request->validate([
+            'image_ids' => ['required', 'array', 'min:1'],
+            'image_ids.*' => ['integer', 'exists:car_images,id'],
+        ]);
 
-        return response()->json(['message' => 'Rasm muvaffaqiyatli o\'chirildi']);
+        $this->carImageService->reorder($moshinaElon, $request->input('image_ids'));
+
+        return response()->json(['message' => 'Tartib yangilandi']);
     }
+
 }

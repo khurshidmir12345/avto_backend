@@ -15,6 +15,7 @@ class MoshinaElonResource extends JsonResource
                 'id' => $this->user->id,
                 'name' => $this->user->name,
                 'phone' => $this->user->phone,
+                'avatar_url' => $this->user->avatar_url,
             ]),
             'category' => $this->whenLoaded('category', fn () => [
                 'id' => $this->category->id,
@@ -38,7 +39,7 @@ class MoshinaElonResource extends JsonResource
             'holati' => $this->holati,
             'bank_kredit' => $this->bank_kredit,
             'general' => $this->general,
-            'images' => MoshinaElonImageResource::collection($this->whenLoaded('images')),
+            'images' => CarImageResource::collection($this->whenLoaded('images')),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];
