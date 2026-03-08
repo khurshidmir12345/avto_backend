@@ -1,7 +1,7 @@
 # Avto Vodiy — Keyingi ishlar
 
 ## Bajarilgan
-- [x] Docker muhitini sozlash (PHP 8.4, MySQL, Redis, Nginx, phpMyAdmin)
+- [x] Docker muhitini sozlash (PHP 8.3, MySQL, Redis, Nginx, phpMyAdmin)
 - [x] Laravel Sanctum o'rnatish
 - [x] Auth API (Register + OTP, Login, Logout, User)
 
