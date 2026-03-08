@@ -19,6 +19,8 @@ class User extends Authenticatable
         'phone',
         'password',
         'phone_verified_at',
+        'balance',
+        'welcome_bonus_received',
         'avatar_path',
         'avatar_disk',
     ];
@@ -35,12 +37,19 @@ class User extends Authenticatable
         return [
             'phone_verified_at' => 'datetime',
             'password' => 'hashed',
+            'balance' => 'integer',
+            'welcome_bonus_received' => 'boolean',
         ];
     }
 
     public function otpCodes(): HasMany
     {
         return $this->hasMany(OtpCode::class, 'phone', 'phone');
+    }
+
+    public function balanceHistory(): HasMany
+    {
+        return $this->hasMany(UserBalanceHistory::class);
     }
 
     public function moshinaElons(): HasMany

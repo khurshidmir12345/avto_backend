@@ -2,30 +2,42 @@
 
 namespace App\Services;
 
+use App\Models\ElonPrice;
 use App\Models\MoshinaElon;
 use App\Models\User;
 use App\Repositories\MoshinaElonRepository;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class MoshinaElonService
 {
     public function __construct(
         private readonly MoshinaElonRepository $repository,
-        private readonly CarImageService $carImageService
+        private readonly CarImageService $carImageService,
+        private readonly BalanceService $balanceService
     ) {}
 
     public function create(User $user, array $data): MoshinaElon
     {
-        $imageIds = $data['image_ids'] ?? [];
-        unset($data['image_ids']);
+        return DB::transaction(function () use ($user, $data) {
+            $price = ElonPrice::getElonCreatePrice();
+            $this->balanceService->addDebit(
+                $user,
+                $price,
+                'E\'lon uchun yechildi'
+            );
 
-        $elon = $user->moshinaElons()->create($data);
+            $imageIds = $data['image_ids'] ?? [];
+            unset($data['image_ids']);
 
-        if (!empty($imageIds)) {
-            $this->carImageService->attachToCar($elon, $imageIds, $user->id);
-        }
+            $elon = $user->moshinaElons()->create($data);
 
-        return $elon->load('images');
+            if (!empty($imageIds)) {
+                $this->carImageService->attachToCar($elon, $imageIds, $user->id);
+            }
+
+            return $elon->load('images');
+        });
     }
 
     public function update(MoshinaElon $elon, array $data): MoshinaElon

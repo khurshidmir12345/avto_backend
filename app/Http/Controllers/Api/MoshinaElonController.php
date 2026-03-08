@@ -51,12 +51,21 @@ class MoshinaElonController extends Controller
 
     public function store(StoreMoshinaElonRequest $request): JsonResponse
     {
-        $elon = $this->elonService->create($request->user(), $request->validated());
+        try {
+            $elon = $this->elonService->create($request->user(), $request->validated());
 
-        return response()->json([
-            'message' => 'E\'lon muvaffaqiyatli yaratildi',
-            'elon' => new MoshinaElonResource($elon),
-        ], 201);
+            return response()->json([
+                'message' => 'E\'lon muvaffaqiyatli yaratildi',
+                'elon' => new MoshinaElonResource($elon),
+            ], 201);
+        } catch (\RuntimeException $e) {
+            if ($e->getMessage() === 'Balans yetarli emas') {
+                return response()->json([
+                    'message' => 'Balans yetarli emas. E\'lon yaratish uchun hisobingizni to\'ldiring.',
+                ], 422);
+            }
+            throw $e;
+        }
     }
 
     public function update(UpdateMoshinaElonRequest $request, MoshinaElon $moshinaElon): JsonResponse

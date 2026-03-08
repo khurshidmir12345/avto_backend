@@ -10,6 +10,7 @@ use App\Http\Requests\Auth\UpdateProfileRequest;
 use App\Http\Requests\Auth\VerifyOtpRequest;
 use App\Models\OtpCode;
 use App\Models\User;
+use App\Services\BalanceService;
 use App\Services\SmsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,7 +21,8 @@ use Throwable;
 class AuthController extends Controller
 {
     public function __construct(
-        private readonly SmsService $smsService
+        private readonly SmsService $smsService,
+        private readonly BalanceService $balanceService
     ) {}
 
     public function register(RegisterRequest $request): JsonResponse
@@ -82,6 +84,10 @@ class AuthController extends Controller
             ], 403);
         }
 
+        if (!$user->welcome_bonus_received) {
+            $user = $this->balanceService->giveWelcomeBonus($user);
+        }
+
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
@@ -116,6 +122,10 @@ class AuthController extends Controller
         }
 
         $user->update(['phone_verified_at' => now()]);
+
+        if (!$user->welcome_bonus_received) {
+            $user = $this->balanceService->giveWelcomeBonus($user);
+        }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
