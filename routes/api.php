@@ -6,9 +6,18 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\MoshinaElonController;
+use App\Http\Controllers\Api\TelegramController;
+use App\Http\Controllers\TelegramWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/categories', [CategoryController::class, 'index']);
+
+// Telegram — webhook (CSRF dan mustasno)
+Route::post('/telegram/webhook/{botType}', TelegramWebhookController::class)
+    ->name('telegram.webhook');
+
+// Telegram link info — auth shart emas (profil sahifasida bot linki ko'rsatish)
+Route::get('/telegram/link-info', [TelegramController::class, 'linkInfo']);
 
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -17,6 +26,7 @@ Route::prefix('auth')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user', [AuthController::class, 'user']);
+        Route::post('/telegram/link', [TelegramController::class, 'link']);
         Route::get('/balance-history', [BalanceController::class, 'history']);
         Route::get('/elon-create-price', [BalanceController::class, 'elonCreatePrice']);
         Route::post('/logout', [AuthController::class, 'logout']);

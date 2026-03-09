@@ -17,6 +17,7 @@ class MoshinaElonResource extends JsonResource
                 'name' => $this->user->name,
                 'phone' => $this->user->phone,
                 'avatar_url' => $this->user->avatar_url,
+                'telegram_username' => $this->user->telegram_username,
             ]),
             'category' => $this->whenLoaded('category', fn () => [
                 'id' => $this->category->id,

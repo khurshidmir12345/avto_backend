@@ -25,6 +25,10 @@ class User extends Authenticatable
         'avatar_path',
         'avatar_disk',
         'is_admin',
+        'telegram_user_id',
+        'telegram_username',
+        'telegram_first_name',
+        'telegram_last_name',
     ];
 
     protected $hidden = [

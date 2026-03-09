@@ -24,12 +24,14 @@ class AdminSeeder extends Seeder
             ]
         );
 
-        User::firstOrCreate(
+        $adminPhone = '+998990000001'; // Admin uchun maxsus raqam (conflictdan qochish)
+
+        User::updateOrCreate(
             ['email' => 'admin@avtovodiy.uz'],
             [
                 'name' => 'Admin',
                 'email' => 'admin@avtovodiy.uz',
-                'phone' => '+998000000002',
+                'phone' => $adminPhone,
                 'password' => 'password',
                 'phone_verified_at' => now(),
                 'balance' => 0,

@@ -16,7 +16,7 @@ class MoshinaElonRepository
     public function getFilteredQuery(array $filters = []): Builder
     {
         $query = $this->model->newQuery()
-            ->with(['user:id,name,phone', 'category:id,name,slug,icon', 'images'])
+            ->with(['user:id,name,phone,telegram_username', 'category:id,name,slug,icon', 'images'])
             ->where('holati', ElonStatus::Active->value)
             ->latest();
 

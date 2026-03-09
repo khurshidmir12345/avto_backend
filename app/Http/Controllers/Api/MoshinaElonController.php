@@ -42,7 +42,7 @@ class MoshinaElonController extends Controller
 
     public function show(MoshinaElon $moshinaElon): JsonResponse
     {
-        $moshinaElon->load(['user:id,name,phone,avatar_path,avatar_disk', 'category:id,name,slug,icon', 'images']);
+        $moshinaElon->load(['user:id,name,phone,avatar_path,avatar_disk,telegram_username', 'category:id,name,slug,icon', 'images']);
 
         return response()->json([
             'elon' => new MoshinaElonResource($moshinaElon),
