@@ -20,9 +20,12 @@ class ResetAdminPassword extends Command
             return self::FAILURE;
         }
 
-        $admin->update(['password' => 'password']);
+        $admin->update([
+            'password' => 'password',
+            'is_admin' => true,
+        ]);
 
-        $this->info('Admin parol yangilandi.');
+        $this->info('Admin parol va ruxsat yangilandi.');
         $this->info('Email: admin@avtovodiy.uz');
         $this->info('Parol: password');
 
