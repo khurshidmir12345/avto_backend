@@ -27,6 +27,7 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user', [AuthController::class, 'user']);
         Route::post('/telegram/link', [TelegramController::class, 'link']);
+        Route::delete('/telegram/unlink', [TelegramController::class, 'unlink']);
         Route::get('/balance-history', [BalanceController::class, 'history']);
         Route::get('/elon-create-price', [BalanceController::class, 'elonCreatePrice']);
         Route::post('/logout', [AuthController::class, 'logout']);

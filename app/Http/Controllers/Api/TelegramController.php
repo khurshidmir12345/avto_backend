@@ -74,6 +74,33 @@ class TelegramController extends Controller
         ]);
     }
 
+    /**
+     * Telegram hisobini profildan uzish.
+     * DELETE /api/auth/telegram/unlink
+     */
+    public function unlink(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        if (!$user->telegram_user_id) {
+            return response()->json([
+                'message' => 'Telegram hisob ulanmagan',
+            ], 422);
+        }
+
+        $user->update([
+            'telegram_user_id' => null,
+            'telegram_username' => null,
+            'telegram_first_name' => null,
+            'telegram_last_name' => null,
+        ]);
+
+        return response()->json([
+            'message' => 'Telegram hisob muvaffaqiyatli uzildi',
+            'user' => $user->fresh(),
+        ]);
+    }
+
     private function extractBotUsername(TelegramBot $bot): ?string
     {
         $cacheKey = 'telegram_bot_username_' . $bot->id;

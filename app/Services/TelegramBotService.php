@@ -66,10 +66,9 @@ class TelegramBotService
         ];
 
         if ($url) {
-            // Web App — link ko'rinmasdan, tugma orqali ochiladi (ishonchliroq)
             $params['reply_markup'] = json_encode([
                 'inline_keyboard' => [
-                    [['text' => 'Ulash 🔗', 'web_app' => ['url' => $url]]],
+                    [['text' => '🔗 Hisobni ulash', 'url' => $url]],
                 ],
             ]);
         }
