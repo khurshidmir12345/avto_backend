@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Conversation;
+use App\Models\Message;
 use App\Models\User;
 use App\Models\UserBalanceHistory;
 use Illuminate\Support\Facades\DB;
@@ -64,7 +66,7 @@ class BalanceService
     }
 
     /**
-     * Birinchi marta kirgan foydalanuvchiga welcome bonus beradi.
+     * Birinchi marta kirgan foydalanuvchiga welcome bonus beradi va chatda xush kelibsiz xabarini yuboradi.
      */
     public function giveWelcomeBonus(User $user): User
     {
@@ -76,6 +78,30 @@ class BalanceService
 
         $user->update(['welcome_bonus_received' => true]);
 
+        $this->sendWelcomeMessage($user);
+
         return $user->fresh();
+    }
+
+    /**
+     * Yangi foydalanuvchiga Avto Vodiy dan xush kelibsiz xabarini yuboradi.
+     */
+    protected function sendWelcomeMessage(User $user): void
+    {
+        $avtoVodiy = User::where('phone', config('chat.avto_vodiy_phone'))->first();
+        if (! $avtoVodiy) {
+            return;
+        }
+
+        $conversation = Conversation::findOrCreateBetween($avtoVodiy->id, $user->id);
+
+        Message::create([
+            'conversation_id' => $conversation->id,
+            'sender_id' => $avtoVodiy->id,
+            'body' => config('chat.welcome_message', 'Assalomu alaykum! Avto Vodiy ga xush kelibsiz!'),
+            'type' => Message::TYPE_TEXT,
+        ]);
+
+        $conversation->update(['last_message_at' => now()]);
     }
 }

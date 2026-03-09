@@ -16,6 +16,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name',
+        'email',
         'phone',
         'password',
         'phone_verified_at',
@@ -23,6 +24,7 @@ class User extends Authenticatable
         'welcome_bonus_received',
         'avatar_path',
         'avatar_disk',
+        'is_admin',
     ];
 
     protected $hidden = [
@@ -39,6 +41,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'balance' => 'integer',
             'welcome_bonus_received' => 'boolean',
+            'is_admin' => 'boolean',
         ];
     }
 

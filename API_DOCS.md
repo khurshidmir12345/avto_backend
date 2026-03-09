@@ -326,7 +326,7 @@ Foydalanuvchi profilini butunlay o'chiradi. Barcha tokenlar ham o'chiriladi.
 | category_id | number | Kategoriya ID bo'yicha filter |
 | marka | string | Marka bo'yicha filter |
 | shahar | string | Shahar bo'yicha filter |
-| yoqilgi_turi | string | benzin, metan, benzin+metan, dizel, elektr, gibrid |
+| yoqilgi_turi | string | benzin, benzin+metan, benzin+propan, dizel, salarka, eloktor, gibrid |
 | narx_min | number | Minimal narx |
 | narx_max | number | Maksimal narx |
 | yil_min | number | Minimal yil |
@@ -733,7 +733,7 @@ Barcha maydonlar ixtiyoriy (faqat o'zgartiriladiganlar yuboriladi).
 
 ### E'lon qiymatlari
 - **valyuta:** USD, UZS
-- **yoqilgi_turi:** benzin, metan, benzin+metan, dizel, elektr, gibrid
+- **yoqilgi_turi:** benzin, benzin+metan, benzin+propan, dizel, salarka, eloktor, gibrid
 - **uzatish_qutisi:** mexanika, avtomat
 - **holati:** active, sold, inactive
 

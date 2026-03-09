@@ -54,4 +54,23 @@ class Message extends Model
 
         return rtrim(config('app.url'), '/') . '/api/chat/media/' . $this->id;
     }
+
+    /**
+     * Admin panel uchun media URL — web session auth ishlatadi.
+     */
+    public function getAdminMediaUrlAttribute(): ?string
+    {
+        if (empty($this->media_path)) {
+            return null;
+        }
+
+        $disk = $this->media_disk ?? config('chat.media.disk', 'r2');
+        $r2Url = config('filesystems.disks.r2.url') ?: env('R2_PUBLIC_URL');
+
+        if ($disk === 'r2' && ! empty($r2Url)) {
+            return rtrim($r2Url, '/') . '/' . ltrim($this->media_path, '/');
+        }
+
+        return route('admin.chat.media', $this);
+    }
 }

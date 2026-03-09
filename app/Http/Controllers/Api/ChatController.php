@@ -183,6 +183,10 @@ class ChatController extends Controller
         $q = $request->get('q', '');
         $currentUserId = $request->user()->id;
 
+        $avtoVodiy = User::where('phone', config('chat.avto_vodiy_phone'))
+            ->select('id', 'name', 'phone', 'avatar_path', 'avatar_disk')
+            ->first();
+
         $users = User::query()
             ->where('id', '!=', $currentUserId)
             ->when($q !== '', fn ($query) => $query->where(function ($qry) use ($q) {
@@ -193,11 +197,24 @@ class ChatController extends Controller
             ->limit(30)
             ->get();
 
-        return response()->json(['data' => $users->map(fn ($u) => [
+        $data = $users->map(fn ($u) => [
             'id' => $u->id,
             'name' => $u->name,
             'phone' => $u->phone,
             'avatar_url' => $u->avatar_url,
-        ])]);
+        ])->values()->all();
+
+        if ($avtoVodiy && $avtoVodiy->id !== $currentUserId) {
+            $avtoVodiyItem = [
+                'id' => $avtoVodiy->id,
+                'name' => $avtoVodiy->name,
+                'phone' => $avtoVodiy->phone,
+                'avatar_url' => $avtoVodiy->avatar_url,
+            ];
+            $data = array_filter($data, fn ($u) => $u['id'] !== $avtoVodiy->id);
+            array_unshift($data, $avtoVodiyItem);
+        }
+
+        return response()->json(['data' => array_values($data)]);
     }
 }

@@ -26,12 +26,13 @@ return [
     |--------------------------------------------------------------------------
     */
     'yoqilgi_turlari' => [
-        'benzin',
-        'metan',
-        'benzin+metan',
-        'dizel',
-        'elektr',
-        'gibrid',
+        'benzin' => 'Benzin',
+        'benzin+metan' => 'Benzin + Metan',
+        'benzin+propan' => 'Benzin + Propan',
+        'dizel' => 'Dizel',
+        'salarka' => 'Salarka',
+        'eloktor' => 'Eloktor',
+        'gibrid' => 'Gibrid',
     ],
 
     /*
