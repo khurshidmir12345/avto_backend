@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\BalanceController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ImageController;
+use App\Http\Controllers\Api\AdvertisementController;
 use App\Http\Controllers\Api\MoshinaElonController;
 use App\Http\Controllers\Api\TelegramController;
 use App\Http\Controllers\TelegramWebhookController;
@@ -51,6 +52,21 @@ Route::prefix('images')->middleware('auth:sanctum')->group(function () {
     Route::post('/presigned-url', [ImageController::class, 'presignedUrl']);
     Route::post('/save', [ImageController::class, 'save']);
     Route::delete('/{image}', [ImageController::class, 'deleteOrphanImage']);
+});
+
+// Reklamalar
+Route::prefix('advertisements')->group(function () {
+    Route::get('/', [AdvertisementController::class, 'index']);
+    Route::post('/{advertisement}/view', [AdvertisementController::class, 'trackView']);
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/price', [AdvertisementController::class, 'price']);
+        Route::get('/my', [AdvertisementController::class, 'myAds']);
+        Route::post('/presigned-url', [AdvertisementController::class, 'presignedUrl']);
+        Route::post('/', [AdvertisementController::class, 'store']);
+        Route::post('/{advertisement}/reactivate', [AdvertisementController::class, 'reactivate']);
+        Route::delete('/{advertisement}', [AdvertisementController::class, 'destroy']);
+    });
 });
 
 Route::prefix('elonlar')->group(function () {

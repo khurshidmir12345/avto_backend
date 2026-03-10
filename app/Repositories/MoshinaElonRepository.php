@@ -40,6 +40,7 @@ class MoshinaElonRepository
         $filterMap = [
             'category_id' => fn ($v) => $query->where('category_id', $v),
             'marka' => fn ($v) => $query->where('marka', $v),
+            'model' => fn ($v) => $query->where('model', $v),
             'shahar' => fn ($v) => $query->where('shahar', $v),
             'yoqilgi_turi' => fn ($v) => $query->where('yoqilgi_turi', $v),
             'narx_min' => fn ($v) => $query->where('narx', '>=', $v),
@@ -52,6 +53,15 @@ class MoshinaElonRepository
             if (isset($filters[$key]) && $filters[$key] !== null && $filters[$key] !== '') {
                 $callback($filters[$key]);
             }
+        }
+
+        // Search: marka va model bo'yicha qisman qidiruv (LIKE)
+        if (! empty($filters['search'])) {
+            $search = '%' . addcslashes($filters['search'], '%_\\') . '%';
+            $query->where(function (Builder $q) use ($search) {
+                $q->where('marka', 'like', $search)
+                    ->orWhere('model', 'like', $search);
+            });
         }
 
         return $query;

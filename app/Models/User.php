@@ -91,6 +91,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(Message::class, 'sender_id');
     }
 
+    public function advertisements(): HasMany
+    {
+        return $this->hasMany(Advertisement::class);
+    }
+
     public function getAvatarUrlAttribute(): ?string
     {
         if (empty($this->avatar_path)) {

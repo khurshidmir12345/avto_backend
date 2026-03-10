@@ -28,7 +28,7 @@ class MoshinaElonController extends Controller
     public function index(Request $request): MoshinaElonCollection|JsonResponse
     {
         $filters = $request->only([
-            'category_id', 'marka', 'shahar', 'yoqilgi_turi',
+            'category_id', 'marka', 'model', 'search', 'shahar', 'yoqilgi_turi',
             'narx_min', 'narx_max', 'yil_min', 'yil_max',
         ]);
 

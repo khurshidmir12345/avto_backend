@@ -149,6 +149,9 @@ class AuthController extends Controller
     {
         return response()->json([
             'user' => $request->user(),
+            'app_config' => [
+                'balance_topup_enabled' => filter_var(env('BALANCE_TOPUP_ENABLED', true), FILTER_VALIDATE_BOOLEAN),
+            ],
         ]);
     }
 
