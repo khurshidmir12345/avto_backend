@@ -9,16 +9,16 @@ class MoshinaElonPolicy
 {
     public function update(User $user, MoshinaElon $moshinaElon): bool
     {
-        return $user->id === $moshinaElon->user_id;
+        return $user->is_admin || $user->id === $moshinaElon->user_id;
     }
 
     public function delete(User $user, MoshinaElon $moshinaElon): bool
     {
-        return $user->id === $moshinaElon->user_id;
+        return $user->is_admin || $user->id === $moshinaElon->user_id;
     }
 
     public function manageImages(User $user, MoshinaElon $moshinaElon): bool
     {
-        return $user->id === $moshinaElon->user_id;
+        return $user->is_admin || $user->id === $moshinaElon->user_id;
     }
 }

@@ -20,6 +20,8 @@ class CarImageResource extends Resource
 {
     protected static ?string $model = CarImage::class;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedPhoto;
 
     protected static \UnitEnum|string|null $navigationGroup = 'E\'lonlar';

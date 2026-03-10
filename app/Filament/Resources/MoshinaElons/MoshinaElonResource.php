@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MoshinaElons;
 
+use App\Filament\Resources\MoshinaElons\Pages\EditMoshinaElon;
 use App\Filament\Resources\MoshinaElons\Pages\ManageMoshinaElons;
 use App\Models\Category;
 use App\Models\MoshinaElon;
@@ -24,6 +25,8 @@ use Filament\Tables\Table;
 class MoshinaElonResource extends Resource
 {
     protected static ?string $model = MoshinaElon::class;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedTruck;
 
@@ -177,6 +180,7 @@ class MoshinaElonResource extends Resource
     {
         return [
             'index' => ManageMoshinaElons::route('/'),
+            'edit' => EditMoshinaElon::route('/{record}/edit'),
         ];
     }
 }
