@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TelegramBots;
 
+use App\Enums\BotType;
 use App\Filament\Resources\TelegramBots\Pages\ManageTelegramBots;
 use App\Models\TelegramBot;
 use Filament\Actions\BulkActionGroup;
@@ -38,13 +39,7 @@ class TelegramBotResource extends Resource
                     ->maxLength(255),
                 Select::make('bot_type')
                     ->label('Bot turi')
-                    ->options([
-                        'set_profile_bot' => 'Profil ulash (Telegram)',
-                        'notification' => 'Bildirishnoma',
-                        'support' => 'Qo\'llab-quvvatlash',
-                        'announcement' => 'E\'lon',
-                        'other' => 'Boshqa',
-                    ])
+                    ->options(BotType::options())
                     ->required()
                     ->native(false),
                 TextInput::make('token')
@@ -54,6 +49,10 @@ class TelegramBotResource extends Resource
                     ->maxLength(255)
                     ->dehydrated(fn ($state) => filled($state))
                     ->helperText('Tahrirlashda: yangi token kiritmasangiz, mavjud token saqlanadi.'),
+                TextInput::make('channel_id')
+                    ->label('Kanal ID (ixtiyoriy)')
+                    ->placeholder('@kanal_username yoki -100xxxxxxxxxx')
+                    ->helperText('Bot kanalda admin bo\'lishi kerak.'),
             ]);
     }
 
@@ -71,18 +70,22 @@ class TelegramBotResource extends Resource
                 TextColumn::make('bot_type')
                     ->label('Bot turi')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'set_profile_bot' => 'Profil ulash',
-                        'notification' => 'Bildirishnoma',
-                        'support' => 'Qo\'llab-quvvatlash',
-                        'announcement' => 'E\'lon',
-                        default => 'Boshqa',
+                    ->formatStateUsing(fn (mixed $state): string => $state instanceof BotType ? $state->label() : (BotType::tryFrom((string) $state)?->label() ?? 'Noma\'lum'))
+                    ->color(fn (mixed $state): string => match ($state instanceof BotType ? $state->value : (string) $state) {
+                        'elon_send_channel' => 'success',
+                        'set_profile_bot' => 'info',
+                        'notification' => 'warning',
+                        default => 'gray',
                     })
                     ->sortable(),
+                TextColumn::make('channel_id')
+                    ->label('Kanal')
+                    ->placeholder('—')
+                    ->toggleable(),
                 TextColumn::make('token')
                     ->label('Token')
                     ->limit(20)
-                    ->formatStateUsing(fn (?string $state): string => $state ? substr($state, 0, 15) . '...' : '-'),
+                    ->formatStateUsing(fn (?string $state): string => $state ? substr($state, 0, 15) . '...' : '—'),
             ])
             ->filters([
                 //

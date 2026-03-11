@@ -33,7 +33,7 @@ class TelegramBotService
             return;
         }
 
-        $bot = TelegramBot::where('bot_type', 'set_profile_bot')->first();
+        $bot = TelegramBot::where('bot_type', \App\Enums\BotType::SetProfileBot->value)->first();
         if (!$bot) {
             return;
         }

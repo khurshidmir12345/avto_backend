@@ -75,13 +75,18 @@ class AdvertisementController extends Controller
     public function presignedUrl(Request $request): JsonResponse
     {
         $request->validate([
-            'content_type' => 'required|string|in:image/jpeg,image/png,image/webp',
+            'content_type' => 'required|string|in:image/jpeg,image/jpg,image/png,image/webp,image/gif,image/bmp,image/heic,image/heif,image/tiff',
         ]);
 
         $user = $request->user();
         $ext = match ($request->content_type) {
             'image/png' => 'png',
             'image/webp' => 'webp',
+            'image/gif' => 'gif',
+            'image/bmp' => 'bmp',
+            'image/heic' => 'heic',
+            'image/heif' => 'heif',
+            'image/tiff' => 'tiff',
             default => 'jpg',
         };
 

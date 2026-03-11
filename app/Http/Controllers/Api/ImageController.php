@@ -95,6 +95,13 @@ class ImageController extends Controller
         return match ($contentType) {
             'image/png' => 'png',
             'image/jpeg', 'image/jpg' => 'jpg',
+            'image/webp' => 'webp',
+            'image/gif' => 'gif',
+            'image/bmp' => 'bmp',
+            'image/heic' => 'heic',
+            'image/heif' => 'heif',
+            'image/tiff' => 'tiff',
+            'image/svg+xml' => 'svg',
             default => 'jpg',
         };
     }

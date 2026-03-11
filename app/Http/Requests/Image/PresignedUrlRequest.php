@@ -16,7 +16,7 @@ class PresignedUrlRequest extends FormRequest
         return [
             'car_id' => ['nullable', 'integer', 'exists:moshina_elons,id'],
             'content_types' => ['required', 'array', 'min:1', 'max:10'],
-            'content_types.*' => ['required', 'string', 'in:image/jpeg,image/jpg,image/png'],
+            'content_types.*' => ['required', 'string', 'in:image/jpeg,image/jpg,image/png,image/webp,image/gif,image/bmp,image/heic,image/heif,image/tiff,image/svg+xml'],
         ];
     }
 
@@ -24,7 +24,7 @@ class PresignedUrlRequest extends FormRequest
     {
         return [
             'content_types.required' => 'Content type lar yuborilishi kerak',
-            'content_types.*.in' => 'Rasm formati: jpg, jpeg, png',
+            'content_types.*.in' => 'Rasm formati: jpg, jpeg, png, webp, gif, bmp, heic, heif, tiff, svg',
         ];
     }
 }

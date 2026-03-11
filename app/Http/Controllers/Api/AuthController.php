@@ -170,12 +170,12 @@ class AuthController extends Controller
     public function uploadAvatar(Request $request): JsonResponse
     {
         $request->validate([
-            'avatar' => ['required', 'image', 'mimes:jpeg,jpg,png,webp', 'max:10240'],
+            'avatar' => ['required', 'image', 'mimes:jpeg,jpg,png,webp,gif,bmp,heic,heif,tiff', 'max:10240'],
         ], [
             'avatar.required' => 'Avatar rasmi yuborilishi kerak',
             'avatar.image' => 'Avatar fayli rasm bo\'lishi kerak',
-            'avatar.mimes' => 'Avatar formati: jpeg, jpg, png, webp',
-            'avatar.max' => 'Avatar maksimum 10240KB bo\'lishi kerak',
+            'avatar.mimes' => 'Rasm formati noto\'g\'ri',
+            'avatar.max' => 'Avatar maksimum 10MB bo\'lishi kerak',
         ]);
 
         $user = $request->user();

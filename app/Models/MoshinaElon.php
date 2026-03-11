@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ElonStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -53,5 +54,37 @@ class MoshinaElon extends Model
     public function images(): HasMany
     {
         return $this->hasMany(CarImage::class, 'car_id')->orderBy('sort_order');
+    }
+
+    public function telegramSentMessages(): HasMany
+    {
+        return $this->hasMany(TelegramSentElon::class);
+    }
+
+    public function isSold(): bool
+    {
+        return $this->holati === ElonStatus::Sold->value;
+    }
+
+    /**
+     * Narxni formatlangan ko'rinishda qaytaradi: $7 900 yoki 79 000 000 so'm.
+     */
+    public function getFormattedNarxAttribute(): string
+    {
+        $amount = number_format((float) $this->narx, 0, '.', ' ');
+
+        return match ($this->valyuta) {
+            'USD' => "\${$amount}",
+            'UZS' => "{$amount} so'm",
+            default => $amount,
+        };
+    }
+
+    /**
+     * Probegni formatlangan ko'rinishda: 62 000 km.
+     */
+    public function getFormattedProbegAttribute(): string
+    {
+        return number_format($this->probeg, 0, '.', ' ') . ' km';
     }
 }
