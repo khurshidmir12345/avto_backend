@@ -86,6 +86,16 @@ class Chat extends Page
             }
         }
 
+        $unreadCounts = collect();
+        if (!empty($convIds)) {
+            $unreadCounts = Message::whereIn('conversation_id', $convIds)
+                ->where('sender_id', '!=', $avtoVodiy->id)
+                ->where('read_at', false)
+                ->selectRaw('conversation_id, count(*) as cnt')
+                ->groupBy('conversation_id')
+                ->pluck('cnt', 'conversation_id');
+        }
+
         $result = collect();
         foreach ($conversations as $conv) {
             $other = $this->getOtherUser($conv);
@@ -97,6 +107,7 @@ class Chat extends Page
                     'last_message_at' => $conv->last_message_at,
                     'last_message_preview' => $lastMsg ? ($lastMsg->type === Message::TYPE_IMAGE ? '🖼 Rasm' : ($lastMsg->type === Message::TYPE_VOICE ? '🎤 Ovoz' : Str::limit($lastMsg->body ?? '', 35))) : null,
                     'last_message_from_me' => $lastMsg && $lastMsg->sender_id === $avtoVodiy->id,
+                    'unread_count' => $unreadCounts->get($conv->id, 0),
                 ]);
             }
         }
@@ -107,6 +118,7 @@ class Chat extends Page
                 'last_message_at' => null,
                 'last_message_preview' => null,
                 'last_message_from_me' => false,
+                'unread_count' => 0,
             ]);
         }
 

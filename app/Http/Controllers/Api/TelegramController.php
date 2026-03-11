@@ -101,6 +101,29 @@ class TelegramController extends Controller
         ]);
     }
 
+    /**
+     * Support bot username va link (public, auth kerak emas).
+     * GET /api/support/bot-info
+     */
+    public function supportBotInfo(): JsonResponse
+    {
+        $bot = TelegramBot::supportBot();
+
+        if (!$bot) {
+            return response()->json([
+                'bot_username' => null,
+                'bot_link' => null,
+            ]);
+        }
+
+        $botUsername = $this->extractBotUsername($bot);
+
+        return response()->json([
+            'bot_username' => $botUsername,
+            'bot_link' => $botUsername ? "https://t.me/{$botUsername}" : null,
+        ]);
+    }
+
     private function extractBotUsername(TelegramBot $bot): ?string
     {
         $cacheKey = 'telegram_bot_username_' . $bot->id;

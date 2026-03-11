@@ -17,13 +17,16 @@ Route::get('/categories', [CategoryController::class, 'index']);
 Route::post('/telegram/webhook/{botType}', TelegramWebhookController::class)
     ->name('telegram.webhook');
 
-// Telegram link info — auth shart emas (profil sahifasida bot linki ko'rsatish)
+// Telegram link info — auth shart emas
 Route::get('/telegram/link-info', [TelegramController::class, 'linkInfo']);
+Route::get('/support/bot-info', [TelegramController::class, 'supportBotInfo']);
 
 Route::prefix('auth')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+    Route::middleware('throttle:5,1')->group(function () {
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/verify-otp', [AuthController::class, 'verifyOtp']);
+    });
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/user', [AuthController::class, 'user']);
@@ -57,7 +60,8 @@ Route::prefix('images')->middleware('auth:sanctum')->group(function () {
 // Reklamalar
 Route::prefix('advertisements')->group(function () {
     Route::get('/', [AdvertisementController::class, 'index']);
-    Route::post('/{advertisement}/view', [AdvertisementController::class, 'trackView']);
+    Route::post('/{advertisement}/view', [AdvertisementController::class, 'trackView'])
+        ->middleware('throttle:30,1');
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/price', [AdvertisementController::class, 'price']);

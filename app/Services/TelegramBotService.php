@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\TelegramBot;
 use App\Models\TelegramLinkToken;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class TelegramBotService
@@ -55,6 +56,78 @@ class TelegramBotService
 
         $replyText = "Telegram hisobingizni Avto Vodiy ilovasiga ulash uchun pastdagi tugmani bosing.";
         $this->sendMessage($bot->token, $chatId, $replyText, $linkUrl);
+    }
+
+    /**
+     * Support bot: user xabarini adminga forward qilish, admin replyni userga yuborish.
+     */
+    public function handleSupportBotMessage(TelegramBot $bot, array $payload): void
+    {
+        if (empty($payload['message'])) {
+            return;
+        }
+
+        $message = $payload['message'];
+        $chatId = $message['chat']['id'] ?? null;
+        $adminChatId = $bot->admin_chat_id;
+
+        if (!$chatId || !$adminChatId) {
+            return;
+        }
+
+        if ((string) $chatId === (string) $adminChatId) {
+            $this->handleAdminReply($bot, $message);
+            return;
+        }
+
+        $this->forwardToAdmin($bot, $chatId, $message);
+    }
+
+    private function forwardToAdmin(TelegramBot $bot, int|string $userChatId, array $message): void
+    {
+        $messageId = $message['message_id'] ?? null;
+        if (!$messageId) {
+            return;
+        }
+
+        Http::post("https://api.telegram.org/bot{$bot->token}/forwardMessage", [
+            'chat_id' => $bot->admin_chat_id,
+            'from_chat_id' => $userChatId,
+            'message_id' => $messageId,
+        ]);
+    }
+
+    private function handleAdminReply(TelegramBot $bot, array $message): void
+    {
+        $replyTo = $message['reply_to_message'] ?? null;
+        if (!$replyTo) {
+            return;
+        }
+
+        $originalChatId = $replyTo['forward_from']['id']
+            ?? $replyTo['forward_sender_name'] // can't reply if hidden
+            ?? null;
+
+        if (!$originalChatId || !is_numeric($originalChatId)) {
+            $forwardOrigin = $replyTo['forward_origin'] ?? null;
+            if ($forwardOrigin && ($forwardOrigin['type'] ?? '') === 'user') {
+                $originalChatId = $forwardOrigin['sender_user']['id'] ?? null;
+            }
+        }
+
+        if (!$originalChatId) {
+            $this->sendMessage(
+                $bot->token,
+                $bot->admin_chat_id,
+                "Foydalanuvchi aniqlanmadi. Forwarded xabarga reply qiling."
+            );
+            return;
+        }
+
+        $text = $message['text'] ?? null;
+        if ($text) {
+            $this->sendMessage($bot->token, $originalChatId, $text);
+        }
     }
 
     public function sendMessage(string $botToken, int|string $chatId, string $text, ?string $url = null): void

@@ -15,7 +15,7 @@ class BalanceController extends Controller
      */
     public function history(Request $request): JsonResponse
     {
-        $perPage = min((int) $request->get('per_page', 15), 50);
+        $perPage = max(1, min((int) $request->get('per_page', 15), 50));
 
         $history = UserBalanceHistory::where('user_id', $request->user()->id)
             ->orderByDesc('created_at')

@@ -13,19 +13,19 @@ class TelegramWebhookController extends Controller
         private readonly TelegramBotService $telegramBotService
     ) {}
 
-    /**
-     * Telegram webhook — set_profile_bot uchun.
-     * Route: POST /api/telegram/webhook/set_profile_bot
-     */
     public function __invoke(Request $request, string $botType): Response
     {
         $bot = TelegramBot::where('bot_type', $botType)->first();
 
-        if (!$bot || $botType !== 'set_profile_bot') {
+        if (!$bot) {
             return response('', 404);
         }
 
-        $this->telegramBotService->handleSetProfileBotMessage($request->all());
+        match ($botType) {
+            'set_profile_bot' => $this->telegramBotService->handleSetProfileBotMessage($request->all()),
+            'support' => $this->telegramBotService->handleSupportBotMessage($bot, $request->all()),
+            default => null,
+        };
 
         return response('', 200);
     }

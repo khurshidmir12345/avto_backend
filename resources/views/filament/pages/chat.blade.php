@@ -389,6 +389,25 @@
             color: rgb(156 163 175);
         }
 
+        /* Unread badge */
+        .avto-unread-badge {
+            flex-shrink: 0;
+            background: #ef4444;
+            color: #ffffff;
+            font-size: 0.6875rem;
+            font-weight: 700;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+        }
+        .avto-chat-user-btn.selected .avto-unread-badge {
+            background: rgba(255,255,255,0.3);
+        }
+
         /* Empty list in sidebar */
         .avto-chat-empty-list {
             padding: 32px 16px;
@@ -436,27 +455,38 @@
                             $avatarUrl = $user->avatar_url ?? null;
                             $isSelected = ($item->conversation && $selectedConversationId === $item->conversation->id)
                                 || (!$item->conversation && $selectedUserId === $user->id);
+                            $unread = $item->unread_count ?? 0;
                         @endphp
                         <button
                             wire:click="{{ $item->conversation ? "selectConversation({$item->conversation->id})" : "selectUser({$user->id})" }}"
                             class="avto-chat-user-btn {{ $isSelected ? 'selected' : '' }}"
                         >
-                            <div class="avto-avatar-wrap">
+                            <div class="avto-avatar-wrap" style="position: relative;">
                                 @if($avatarUrl)
                                     <img src="{{ $avatarUrl }}" alt="" />
                                 @else
                                     <span style="font-size: 1.125rem; font-weight: 600;">{{ substr($user->name ?? '?', 0, 1) }}</span>
                                 @endif
+                                @if($unread > 0 && !$isSelected)
+                                    <span style="position: absolute; top: -2px; right: -2px; background: #ef4444; color: white; font-size: 0.625rem; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid rgb(249 250 251);">
+                                        {{ $unread > 99 ? '99+' : $unread }}
+                                    </span>
+                                @endif
                             </div>
                             <div style="min-width: 0; flex: 1; overflow: hidden;">
-                                <div class="avto-user-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                    {{ $user->name ?? 'Noma\'lum' }}
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <div class="avto-user-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; {{ $unread > 0 ? 'font-weight: 700;' : '' }}">
+                                        {{ $user->name ?? 'Noma\'lum' }}
+                                    </div>
+                                    @if($unread > 0 && !$isSelected)
+                                        <span class="avto-unread-badge">{{ $unread > 99 ? '99+' : $unread }}</span>
+                                    @endif
                                 </div>
                                 <div class="avto-user-phone" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                     {{ $user->phone }}
                                 </div>
                                 @if($item->last_message_preview)
-                                    <div class="avto-user-preview" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <div class="avto-user-preview" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; {{ $unread > 0 ? 'font-weight: 600; opacity: 0.9;' : '' }}">
                                         {{ $item->last_message_from_me ? 'Siz: ' : '' }}{{ $item->last_message_preview }}
                                     </div>
                                 @endif

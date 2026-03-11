@@ -15,6 +15,7 @@ class TelegramBot extends Model
         'bot_type',
         'token',
         'channel_id',
+        'admin_chat_id',
     ];
 
     protected function casts(): array
@@ -35,5 +36,10 @@ class TelegramBot extends Model
     public static function elonSendChannel(): ?self
     {
         return static::where('bot_type', BotType::ElonSendChannel->value)->first();
+    }
+
+    public static function supportBot(): ?self
+    {
+        return static::where('bot_type', BotType::Support->value)->first();
     }
 }
