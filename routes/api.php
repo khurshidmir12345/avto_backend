@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\MoshinaElonController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\TelegramController;
+use App\Http\Controllers\Api\PageViewController;
 use App\Http\Controllers\Api\TelegramChannelController;
 use App\Http\Controllers\Api\UserTelegramChannelController;
 use App\Http\Controllers\TelegramWebhookController;
@@ -106,6 +107,10 @@ Route::prefix('blocked-users')->middleware('auth:sanctum')->group(function () {
     Route::post('/', [BlockController::class, 'store']);
     Route::delete('/{blockedUserId}', [BlockController::class, 'destroy']);
 });
+
+// Analitika — auth shart emas
+Route::post('/page-views', [PageViewController::class, 'store'])
+    ->middleware('throttle:60,1');
 
 Route::prefix('elonlar')->group(function () {
     Route::get('/', [MoshinaElonController::class, 'index']);
