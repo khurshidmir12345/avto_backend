@@ -6,12 +6,18 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\AdvertisementController;
+use App\Http\Controllers\Api\BlockController;
 use App\Http\Controllers\Api\MoshinaElonController;
+use App\Http\Controllers\Api\FavoriteController;
+use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\TelegramController;
+use App\Http\Controllers\Api\TelegramChannelController;
+use App\Http\Controllers\Api\UserTelegramChannelController;
 use App\Http\Controllers\TelegramWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/telegram-channels', [TelegramChannelController::class, 'index']);
 
 // Telegram — webhook (CSRF dan mustasno)
 Route::post('/telegram/webhook/{botType}', TelegramWebhookController::class)
@@ -39,6 +45,14 @@ Route::prefix('auth')->group(function () {
         Route::put('/profile', [AuthController::class, 'updateProfile']);
         Route::put('/password', [AuthController::class, 'changePassword']);
         Route::delete('/profile', [AuthController::class, 'deleteProfile']);
+
+        Route::prefix('user-channels')->group(function () {
+            Route::get('/', [UserTelegramChannelController::class, 'index']);
+            Route::post('/', [UserTelegramChannelController::class, 'store']);
+            Route::put('/{id}', [UserTelegramChannelController::class, 'update']);
+            Route::delete('/{id}', [UserTelegramChannelController::class, 'destroy']);
+            Route::post('/{id}/test', [UserTelegramChannelController::class, 'test']);
+        });
     });
 });
 
@@ -71,6 +85,26 @@ Route::prefix('advertisements')->group(function () {
         Route::post('/{advertisement}/reactivate', [AdvertisementController::class, 'reactivate']);
         Route::delete('/{advertisement}', [AdvertisementController::class, 'destroy']);
     });
+});
+
+// Sevimlilar
+Route::prefix('favorites')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [FavoriteController::class, 'index']);
+    Route::post('/toggle', [FavoriteController::class, 'toggle']);
+    Route::get('/check/{elonId}', [FavoriteController::class, 'check']);
+});
+
+// Shikoyatlar
+Route::prefix('reports')->middleware('auth:sanctum')->group(function () {
+    Route::post('/', [ReportController::class, 'store']);
+    Route::get('/my', [ReportController::class, 'myReports']);
+});
+
+// Bloklash
+Route::prefix('blocked-users')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [BlockController::class, 'index']);
+    Route::post('/', [BlockController::class, 'store']);
+    Route::delete('/{blockedUserId}', [BlockController::class, 'destroy']);
 });
 
 Route::prefix('elonlar')->group(function () {

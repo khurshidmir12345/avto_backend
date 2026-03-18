@@ -24,10 +24,24 @@ class ChatController extends Controller
     public function index(Request $request): ResourceCollection
     {
         $user = $request->user();
+        $blockedIds = $user->getBlockedUserIds();
+        $blockedByIds = $user->blockedByUsers()->pluck('user_id')->toArray();
+        $allBlockedIds = array_unique(array_merge($blockedIds, $blockedByIds));
 
         $conversations = Conversation::query()
             ->where(function ($q) use ($user) {
                 $q->where('user_a_id', $user->id)->orWhere('user_b_id', $user->id);
+            })
+            ->when(!empty($allBlockedIds), function ($q) use ($user, $allBlockedIds) {
+                $q->where(function ($sub) use ($user, $allBlockedIds) {
+                    $sub->where(function ($inner) use ($user, $allBlockedIds) {
+                        $inner->where('user_a_id', $user->id)
+                            ->whereNotIn('user_b_id', $allBlockedIds);
+                    })->orWhere(function ($inner) use ($user, $allBlockedIds) {
+                        $inner->where('user_b_id', $user->id)
+                            ->whereNotIn('user_a_id', $allBlockedIds);
+                    });
+                });
             })
             ->with(['userA:id,name,phone,avatar_path,avatar_disk', 'userB:id,name,phone,avatar_path,avatar_disk'])
             ->with(['messages' => fn ($q) => $q->latest()->limit(1)])
@@ -85,6 +99,16 @@ class ChatController extends Controller
         $user = $request->user();
         if ($conversation->user_a_id !== $user->id && $conversation->user_b_id !== $user->id) {
             abort(403, 'Ruxsat yo\'q');
+        }
+
+        $otherUserId = $conversation->user_a_id === $user->id
+            ? $conversation->user_b_id
+            : $conversation->user_a_id;
+
+        if ($user->hasBlocked($otherUserId) || $user->isBlockedBy($otherUserId)) {
+            return response()->json([
+                'message' => 'Bu foydalanuvchiga xabar yuborib bo\'lmaydi',
+            ], 403);
         }
 
         $body = $request->input('body', '');

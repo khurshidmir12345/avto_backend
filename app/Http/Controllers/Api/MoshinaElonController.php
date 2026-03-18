@@ -33,6 +33,14 @@ class MoshinaElonController extends Controller
         ]);
 
         $query = $this->repository->getFilteredQuery($filters);
+
+        if ($request->user()) {
+            $blockedIds = $request->user()->getBlockedUserIds();
+            if (!empty($blockedIds)) {
+                $query->whereNotIn('user_id', $blockedIds);
+            }
+        }
+
         $perPage = $request->get('per_page', config('moshina_elon.per_page'));
 
         return new MoshinaElonCollection(

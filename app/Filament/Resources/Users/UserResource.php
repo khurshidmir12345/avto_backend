@@ -87,6 +87,11 @@ class UserResource extends Resource
                 IconColumn::make('is_admin')
                     ->label('Admin')
                     ->boolean(),
+                IconColumn::make('is_banned')
+                    ->label('Ban')
+                    ->boolean()
+                    ->trueColor('danger')
+                    ->falseColor('success'),
                 TextColumn::make('created_at')
                     ->label('Ro\'yxatdan o\'tgan')
                     ->dateTime()
@@ -143,6 +148,41 @@ class UserResource extends Resource
                             ->title('Parol o\'zgartirildi')
                             ->success()
                             ->send();
+                    }),
+                \Filament\Actions\Action::make('banUser')
+                    ->label('Ban')
+                    ->icon(Heroicon::OutlinedNoSymbol)
+                    ->color('danger')
+                    ->visible(fn (User $record) => !$record->is_banned)
+                    ->requiresConfirmation()
+                    ->form([
+                        TextInput::make('ban_reason')
+                            ->label('Ban sababi')
+                            ->required()
+                            ->maxLength(500),
+                    ])
+                    ->action(function (User $record, array $data): void {
+                        $record->update([
+                            'is_banned' => true,
+                            'banned_at' => now(),
+                            'ban_reason' => $data['ban_reason'],
+                        ]);
+                        $record->tokens()->delete();
+                        Notification::make()->title('Foydalanuvchi ban qilindi')->success()->send();
+                    }),
+                \Filament\Actions\Action::make('unbanUser')
+                    ->label('Unban')
+                    ->icon(Heroicon::OutlinedCheckCircle)
+                    ->color('success')
+                    ->visible(fn (User $record) => $record->is_banned)
+                    ->requiresConfirmation()
+                    ->action(function (User $record): void {
+                        $record->update([
+                            'is_banned' => false,
+                            'banned_at' => null,
+                            'ban_reason' => null,
+                        ]);
+                        Notification::make()->title('Foydalanuvchi ban olib tashlandi')->success()->send();
                     }),
                 DeleteAction::make(),
             ])

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ElonStatus;
 use App\Jobs\DeleteElonFromTelegramChannelJob;
 use App\Jobs\SendElonToTelegramChannelJob;
+use App\Jobs\SendElonToUserChannelsJob;
 use App\Models\ElonPrice;
 use App\Models\MoshinaElon;
 use App\Models\User;
@@ -43,6 +44,7 @@ class MoshinaElonService
 
         if ($elon->images->isNotEmpty()) {
             SendElonToTelegramChannelJob::dispatch($elon->id)->delay(now()->addSeconds(5));
+            SendElonToUserChannelsJob::dispatch($elon->id)->delay(now()->addSeconds(10));
         }
 
         return $elon;

@@ -10,6 +10,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/privacy-policy', function () {
+    return view('privacy-policy');
+})->name('privacy-policy');
+
+Route::get('/terms', function () {
+    return view('terms');
+})->name('terms');
+
 // Telegram profil ulash — web link (mobil da deep linkga redirect)
 Route::get('/telegram-link', TelegramLinkController::class)->name('telegram.link');
 

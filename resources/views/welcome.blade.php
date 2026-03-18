@@ -503,9 +503,10 @@
                 </div>
 
                 <div class="flex items-center gap-6 text-sm text-white/40">
+                    <a href="{{ route('privacy-policy') }}" class="hover:text-white transition-colors duration-300">Maxfiylik siyosati</a>
+                    <a href="{{ route('terms') }}" class="hover:text-white transition-colors duration-300">Foydalanish shartlari</a>
                     <a href="https://t.me/avto_vodiyuz" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors duration-300">Telegram</a>
                     <a href="https://instagram.com/avto_ellon" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors duration-300">Instagram</a>
-                    <a href="https://t.me/khurshid_mirzajonov" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors duration-300">Muallif</a>
                 </div>
             </div>
             <div class="mt-6 pt-6 border-t border-white/[0.04] text-center">

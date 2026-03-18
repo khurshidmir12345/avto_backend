@@ -165,10 +165,8 @@ class TelegramChannelService
 
         $lines[] = '';
 
-        $androidLink = config('telegram.app_links.android', '#');
-        $iphoneLink = config('telegram.app_links.iphone', '#');
-        $lines[] = "📲 Элон бериш:";
-        $lines[] = "<a href=\"{$androidLink}\">Android</a> | <a href=\"{$iphoneLink}\">iPhone</a>";
+        $elonLink = config('app.url') . '/elon/' . $elon->id;
+        $lines[] = "👉 <a href=\"{$elonLink}\">Ilovada ko'rish</a>";
 
         $lines[] = '';
         $lines[] = config('telegram.channel.disclaimer', '');
@@ -181,14 +179,12 @@ class TelegramChannelService
      */
     private function buildInlineKeyboard(MoshinaElon $elon): array
     {
-        $androidLink = config('telegram.app_links.android', '#');
-        $iphoneLink = config('telegram.app_links.iphone', '#');
+        $elonLink = config('app.url') . '/elon/' . $elon->id;
 
         return [
             'inline_keyboard' => [
                 [
-                    ['text' => '📲 Android', 'url' => $androidLink],
-                    ['text' => '📲 iPhone', 'url' => $iphoneLink],
+                    ['text' => "👉 Batafsil ko'rish", 'url' => $elonLink],
                 ],
             ],
         ];

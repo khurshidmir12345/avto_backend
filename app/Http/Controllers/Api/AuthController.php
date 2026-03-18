@@ -78,6 +78,12 @@ class AuthController extends Controller
             ], 401);
         }
 
+        if ($user->is_banned) {
+            return response()->json([
+                'message' => 'Sizning hisobingiz bloklangan. Sabab: ' . ($user->ban_reason ?? 'Noma\'lum'),
+            ], 403);
+        }
+
         if (!$user->phone_verified_at) {
             return response()->json([
                 'message' => 'Telefon raqam tasdiqlanmagan. Iltimos, avval ro\'yxatdan o\'ting.',

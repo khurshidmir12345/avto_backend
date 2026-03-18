@@ -5,7 +5,9 @@ namespace App\Models;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -27,6 +29,9 @@ class User extends Authenticatable implements FilamentUser
         'avatar_path',
         'avatar_disk',
         'is_admin',
+        'is_banned',
+        'banned_at',
+        'ban_reason',
         'telegram_user_id',
         'telegram_username',
         'telegram_first_name',
@@ -48,6 +53,8 @@ class User extends Authenticatable implements FilamentUser
             'balance' => 'integer',
             'welcome_bonus_received' => 'boolean',
             'is_admin' => 'boolean',
+            'is_banned' => 'boolean',
+            'banned_at' => 'datetime',
         ];
     }
 
@@ -94,6 +101,58 @@ class User extends Authenticatable implements FilamentUser
     public function advertisements(): HasMany
     {
         return $this->hasMany(Advertisement::class);
+    }
+
+    public function blockedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'blocked_users', 'user_id', 'blocked_user_id')
+            ->withTimestamps();
+    }
+
+    public function blockedByUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'blocked_users', 'blocked_user_id', 'user_id')
+            ->withTimestamps();
+    }
+
+    public function reports(): MorphMany
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
+
+    public function filedReports(): HasMany
+    {
+        return $this->hasMany(Report::class, 'reporter_id');
+    }
+
+    public function telegramChannels(): HasMany
+    {
+        return $this->hasMany(UserTelegramChannel::class);
+    }
+
+    public function activeTelegramChannels(): HasMany
+    {
+        return $this->hasMany(UserTelegramChannel::class)->where('is_active', true);
+    }
+
+    public function favorites(): HasMany
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    public function hasBlocked(int $userId): bool
+    {
+        return $this->blockedUsers()->where('blocked_user_id', $userId)->exists();
+    }
+
+    public function isBlockedBy(int $userId): bool
+    {
+        return $this->blockedByUsers()->where('user_id', $userId)->exists();
+    }
+
+    public function getBlockedUserIds(): array
+    {
+        return $this->blockedUsers()->pluck('blocked_user_id')->toArray();
     }
 
     public function getAvatarUrlAttribute(): ?string
