@@ -47,14 +47,12 @@ class TelegramChannelService
         }
 
         $caption = $this->formatCaption($elon);
-        $keyboard = $this->buildInlineKeyboard($elon);
 
         $response = $this->sendPhoto(
             $bot->token,
             $bot->channel_id,
             $collageData,
             $caption,
-            $keyboard,
         );
 
         if (! $response) {
@@ -164,36 +162,20 @@ class TelegramChannelService
         }
 
         $lines[] = '';
-
-        $elonLink = config('app.url') . '/elon/' . $elon->id;
-        $lines[] = "👉 <a href=\"{$elonLink}\">Ilovada ko'rish</a>";
-
+        $lines[] = '📲 Элон бериш:';
+        $lines[] = '<a href="https://play.google.com/store/apps/details?id=uz.avtovodiy.app">Android</a> | <a href="https://apps.apple.com/app/avto-vodiy/id6744064407">iPhone</a>';
         $lines[] = '';
-        $lines[] = config('telegram.channel.disclaimer', '');
+        $lines[] = '⚠️ Эслатма:';
+        $lines[] = 'Машинани кўрмасдан пул ташламанг.';
+        $lines[] = 'Канал савдога масъул эмас.';
 
         return implode("\n", array_filter($lines, fn ($l) => $l !== null));
     }
 
     /**
-     * Inline keyboard tugmalari.
-     */
-    private function buildInlineKeyboard(MoshinaElon $elon): array
-    {
-        $elonLink = config('app.url') . '/elon/' . $elon->id;
-
-        return [
-            'inline_keyboard' => [
-                [
-                    ['text' => "👉 Batafsil ko'rish", 'url' => $elonLink],
-                ],
-            ],
-        ];
-    }
-
-    /**
      * Telegram kanalga rasm + caption yuboradi.
      */
-    private function sendPhoto(string $token, string $channelId, string $photoData, string $caption, array $keyboard): ?array
+    private function sendPhoto(string $token, string $channelId, string $photoData, string $caption): ?array
     {
         try {
             $response = Http::timeout(30)
@@ -202,7 +184,6 @@ class TelegramChannelService
                     'chat_id' => $channelId,
                     'caption' => $caption,
                     'parse_mode' => 'HTML',
-                    'reply_markup' => json_encode($keyboard),
                 ]);
 
             if (! $response->successful()) {
