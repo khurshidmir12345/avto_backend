@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\TelegramBot;
 use App\Models\TelegramLinkToken;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -58,6 +59,16 @@ class TelegramController extends Controller
         }
 
         $user = $request->user();
+
+        $existingUser = User::where('telegram_user_id', $linkToken->telegram_user_id)
+            ->where('id', '!=', $user->id)
+            ->first();
+
+        if ($existingUser) {
+            return response()->json([
+                'message' => 'Bu Telegram hisob boshqa foydalanuvchiga ulangan.',
+            ], 409);
+        }
 
         $user->update([
             'telegram_user_id' => $linkToken->telegram_user_id,
