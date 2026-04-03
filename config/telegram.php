@@ -8,7 +8,7 @@ return [
     ],
 
     'app_links' => [
-        'android' => env('APP_LINK_ANDROID', 'https://play.google.com/store/apps/details?id=uz.avtovodiy'),
+        'android' => env('APP_LINK_ANDROID', 'https://play.google.com/store/apps/details?id=uz.avtovodiy.app'),
         'iphone' => env('APP_LINK_IPHONE', 'https://apps.apple.com/us/app/avto-vodiy/id6760177390'),
     ],
 
